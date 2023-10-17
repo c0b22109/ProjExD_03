@@ -152,6 +152,18 @@ class Explosion:
         self.life -= 1
         screen.blit(self.exp_img_lst[self.life % len(self.exp_img_lst)], self.rect)
 
+class Score:
+    def __init__(self):
+        self.font = pg.font.SysFont("hgp創英角ﾎﾟｯﾌﾟ体", 30)
+        self.txt_color = (0, 0, 255)
+        self.score = 0
+        self.img = self.font.render(f"スコア:{self.score}", 0, self.txt_color)
+        self.rect = self.img.get_rect()
+        self.rect.center = (100, HEIGHT - 50)
+
+    def update(self, screen: pg.Surface):
+        self.img = self.font.render(f"スコア:{self.score}", 0, self.txt_color)
+        screen.blit(self.img, self.rect)
 
 def main():
     pg.display.set_caption("たたかえ！こうかとん")
@@ -161,6 +173,7 @@ def main():
     bomb_lst = [Bomb() for i in range(NUM_OF_BOMBS)]
     beam = None
     explosion_lst = []
+    score = Score()
 
     clock = pg.time.Clock()
     tmr = 0
@@ -183,6 +196,7 @@ def main():
                     return
             if beam is not None and bomb is not None: 
                 if beam.rect.colliderect(bomb.rct):
+                    score.score += 1
                     explosion_lst.append(Explosion(bomb))
                     beam = None
                     bomb_lst[bomb_lst_index] = None
@@ -201,7 +215,8 @@ def main():
             if explosion.life <= 0:
                 del explosion_lst[explosion_lst_index]
             else:
-                explosion.update(screen) 
+                explosion.update(screen)
+        score.update(screen)
         pg.display.update()
         tmr += 1
         clock.tick(50)
