@@ -28,7 +28,7 @@ def check_bound(obj_rct: pg.Rect) -> tuple[bool, bool]:
 class Beam:
     def __init__(self, bird):
         self.vx, self.vy = bird.dire
-        self.img = pg.transform.rotozoom(pg.image.load("./fig/beam.png"), math.degrees(math.atan2(-self.vy, self.vx)), 1)
+        self.img = pg.transform.rotozoom(pg.image.load("fig/beam.png"), math.degrees(math.atan2(-self.vy, self.vx)), 1)
         self.rect = self.img.get_rect()
         self.rect.center = [
             bird.rct.centerx + bird.rct.width * self.vx / 5,
@@ -58,7 +58,7 @@ class Bird:
         引数2 xy：こうかとん画像の位置座標タプル
         """
         self.img = pg.transform.rotozoom(  # 2倍に拡大
-            pg.image.load(f"./fig/{num}.png"), 
+            pg.image.load(f"fig/{num}.png"), 
             0, 
             2.0
         )
@@ -79,7 +79,7 @@ class Bird:
         引数1 num：こうかとん画像ファイル名の番号
         引数2 screen：画面Surface
         """
-        self.img = pg.transform.rotozoom(pg.image.load(f"./fig/{num}.png"), 0, 2.0)
+        self.img = pg.transform.rotozoom(pg.image.load(f"fig/{num}.png"), 0, 2.0)
         screen.blit(self.img, self.rct)
 
     def update(self, key_lst: list[bool], screen: pg.Surface):
@@ -140,7 +140,7 @@ class Bomb:
 
 class Explosion:
     def __init__(self, bomb: Bomb):
-        exp_img = pg.image.load("./fig/explosion.gif")
+        exp_img = pg.image.load("fig/explosion.gif")
         self.exp_img_lst = [
             pg.transform.flip(exp_img, i, j) for i in [True, False] for j in [True, False]
         ]
@@ -168,7 +168,7 @@ class Score:
 def main():
     pg.display.set_caption("たたかえ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))    
-    bg_img = pg.image.load("./fig/pg_bg.jpg")
+    bg_img = pg.image.load("fig/pg_bg.jpg")
     bird = Bird(3, (900, 400))
     bomb_lst = [Bomb() for i in range(NUM_OF_BOMBS)]
     beam = None
