@@ -165,6 +165,7 @@ class Score:
         self.img = self.font.render(f"スコア:{self.score}", 0, self.txt_color)
         screen.blit(self.img, self.rect)
 
+
 def main():
     pg.display.set_caption("たたかえ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))    
@@ -172,6 +173,7 @@ def main():
     bird = Bird(3, (900, 400))
     bomb_lst = [Bomb() for i in range(NUM_OF_BOMBS)]
     beam = None
+    beam_lst = []
     explosion_lst = []
     score = Score()
 
@@ -181,6 +183,8 @@ def main():
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 return
+            if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
+                beam_lst.append(Beam(bird))
         
         screen.blit(bg_img, [0, 0])
     
@@ -194,28 +198,33 @@ def main():
                     pg.display.update()
                     time.sleep(1)
                     return
-            if beam is not None and bomb is not None: 
+            for (beam_lst_index, beam) in enumerate(beam_lst):
                 if beam.rect.colliderect(bomb.rct):
                     score.score += 1
                     explosion_lst.append(Explosion(bomb))
-                    beam = None
+                    beam_lst[beam_lst_index] = None
                     bomb_lst[bomb_lst_index] = None
                     bird.change_img(6, screen)
+            beam_lst = [beam for beam in beam_lst if beam is not None]
+            bomb_lst = [bomb for bomb in bomb_lst if bomb is not None]
 
         key_lst = pg.key.get_pressed()
-        if key_lst[pg.K_SPACE]:
-            beam = Beam(bird)
         bird.update(key_lst, screen)
         for bomb in bomb_lst:
             if bomb is not None:
                 bomb.update(screen)
-        if beam is not None:
-            beam.update(screen)
+        for (beam_lst_index, beam) in enumerate(beam_lst):
+            if check_bound(beam.rect) != (True, True):
+                beam_lst[beam_lst_index] = None
+            else:
+                beam.update(screen)
+        beam_lst = [beam for beam in beam_lst if beam is not None ]
         for (explosion_lst_index, explosion) in enumerate(explosion_lst):
             if explosion.life <= 0:
-                del explosion_lst[explosion_lst_index]
+                explosion_lst[explosion_lst_index] = None
             else:
                 explosion.update(screen)
+        explosion_lst = [explosion for explosion in explosion_lst if explosion is not None]
         score.update(screen)
         pg.display.update()
         tmr += 1
