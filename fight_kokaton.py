@@ -23,6 +23,18 @@ def check_bound(obj_rct: pg.Rect) -> tuple[bool, bool]:
     return yoko, tate
 
 
+class Beam:
+    def __init__(self, bird):
+        self.img = pg.image.load("fig/beam.png")
+        self.rect = self.img.get_rect()
+        self.rect.centery = bird.rct.centery
+        self.rect.left = bird.rct.right 
+
+    def update(self, screen):
+        self.rect.move_ip(5, 0)
+        screen.blit(self.img, self.rect)
+        
+
 class Bird:
     """
     ゲームキャラクター（こうかとん）に関するクラス
@@ -42,7 +54,7 @@ class Bird:
         """
         self.img = pg.transform.flip(  # 左右反転
             pg.transform.rotozoom(  # 2倍に拡大
-                pg.image.load(f"ex03/fig/{num}.png"), 
+                pg.image.load(f"fig/{num}.png"), 
                 0, 
                 2.0), 
             True, 
@@ -57,7 +69,7 @@ class Bird:
         引数1 num：こうかとん画像ファイル名の番号
         引数2 screen：画面Surface
         """
-        self.img = pg.transform.rotozoom(pg.image.load(f"ex03/fig/{num}.png"), 0, 2.0)
+        self.img = pg.transform.rotozoom(pg.image.load(f"fig/{num}.png"), 0, 2.0)
         screen.blit(self.img, self.rct)
 
     def update(self, key_lst: list[bool], screen: pg.Surface):
@@ -111,9 +123,10 @@ class Bomb:
 def main():
     pg.display.set_caption("たたかえ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))    
-    bg_img = pg.image.load("ex03/fig/pg_bg.jpg")
+    bg_img = pg.image.load("fig/pg_bg.jpg")
     bird = Bird(3, (900, 400))
     bomb = Bomb((255, 0, 0), 10)
+    beam = None
 
     clock = pg.time.Clock()
     tmr = 0
@@ -123,17 +136,29 @@ def main():
                 return
         
         screen.blit(bg_img, [0, 0])
-        
-        if bird.rct.colliderect(bomb.rct):
-            # ゲームオーバー時に，こうかとん画像を切り替え，1秒間表示させる
-            bird.change_img(8, screen)
-            pg.display.update()
-            time.sleep(1)
-            return
+    
+        if bomb is not None:    
+            if bird.rct.colliderect(bomb.rct):
+                # ゲームオーバー時に，こうかとん画像を切り替え，1秒間表示させる
+                beam = None
+                bomb = None
+                bird.change_img(8, screen)
+                pg.display.update()
+                time.sleep(1)
+                return
+        if beam is not None and bomb is not None: 
+            if beam.rect.colliderect(bomb.rct):
+                beam = None
+                bomb = None
 
         key_lst = pg.key.get_pressed()
+        if key_lst[pg.K_SPACE]:
+            beam = Beam(bird)
         bird.update(key_lst, screen)
-        bomb.update(screen)
+        if bomb is not None:
+            bomb.update(screen)
+        if beam is not None:
+            beam.update(screen)
         pg.display.update()
         tmr += 1
         clock.tick(50)
