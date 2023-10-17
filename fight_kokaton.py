@@ -150,6 +150,7 @@ def main():
             if beam.rect.colliderect(bomb.rct):
                 beam = None
                 bomb = None
+                bird.change_img(6, screen)
 
         key_lst = pg.key.get_pressed()
         if key_lst[pg.K_SPACE]:
