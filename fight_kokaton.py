@@ -52,14 +52,18 @@ class Bird:
         引数1 num：こうかとん画像ファイル名の番号
         引数2 xy：こうかとん画像の位置座標タプル
         """
-        self.img = pg.transform.flip(  # 左右反転
-            pg.transform.rotozoom(  # 2倍に拡大
-                pg.image.load(f"fig/{num}.png"), 
-                0, 
-                2.0), 
-            True, 
-            False
+        self.img = pg.transform.rotozoom(  # 2倍に拡大
+            pg.image.load(f"fig/{num}.png"), 
+            0, 
+            2.0
         )
+
+        self.img_dict: dict = {
+            (i * 5, j * 5): pg.transform.flip(pg.transform.rotozoom(self.img, 90 * j, 1), True, False) if i == 0 \
+            else pg.transform.flip(pg.transform.rotozoom(self.img, 45 * j, 1), True, False) if i >= 0 \
+            else pg.transform.rotozoom(self.img, 45 * j, 1) for i in range(-1, 2) for j in range(-1, 2)
+        }   #移動量の合計値をキーとするこうかとんの画像Surfaceの辞書を作成
+        self.img = self.img_dict[(5, 0)]
         self.rct = self.img.get_rect()
         self.rct.center = xy
 
@@ -86,6 +90,7 @@ class Bird:
         self.rct.move_ip(sum_mv)
         if check_bound(self.rct) != (True, True):
             self.rct.move_ip(-sum_mv[0], -sum_mv[1])
+        self.img = self.img_dict[tuple(sum_mv)]
         screen.blit(self.img, self.rct)
 
 
