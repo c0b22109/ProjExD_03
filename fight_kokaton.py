@@ -1,6 +1,7 @@
 import random
 import sys
 import time
+import math
 
 import pygame as pg
 
@@ -26,13 +27,16 @@ def check_bound(obj_rct: pg.Rect) -> tuple[bool, bool]:
 
 class Beam:
     def __init__(self, bird):
-        self.img = pg.image.load("fig/beam.png")
+        self.vx, self.vy = bird.dire
+        self.img = pg.transform.rotozoom(pg.image.load("fig/beam.png"), math.degrees(math.atan2(-self.vy, self.vx)), 1)
         self.rect = self.img.get_rect()
-        self.rect.centery = bird.rct.centery
-        self.rect.left = bird.rct.right 
+        self.rect.center = [
+            bird.rct.centerx + bird.rct.width * self.vx / 5,
+            bird.rct.centery + bird.rct.height * self.vy / 5
+        ]
 
     def update(self, screen):
-        self.rect.move_ip(5, 0)
+        self.rect.move_ip(self.vx, self.vy)
         screen.blit(self.img, self.rect)
         
 
@@ -67,6 +71,7 @@ class Bird:
         self.img = self.img_dict[(5, 0)]
         self.rct = self.img.get_rect()
         self.rct.center = xy
+        self.dire = (+5, 0)
 
     def change_img(self, num: int, screen: pg.Surface):
         """
@@ -93,6 +98,8 @@ class Bird:
             self.rct.move_ip(-sum_mv[0], -sum_mv[1])
         self.img = self.img_dict[tuple(sum_mv)]
         screen.blit(self.img, self.rct)
+        if sum_mv != [0, 0]:
+            self.dire = sum_mv
 
 
 class Bomb:
