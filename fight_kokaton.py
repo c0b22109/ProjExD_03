@@ -29,15 +29,15 @@ class Beam:
     def __init__(self, bird):
         self.vx, self.vy = bird.dire
         self.img = pg.transform.rotozoom(pg.image.load("./fig/beam.png"), math.degrees(math.atan2(-self.vy, self.vx)), 1)
-        self.rect = self.img.get_rect()
-        self.rect.center = [
+        self.rct = self.img.get_rect()
+        self.rct.center = [
             bird.rct.centerx + bird.rct.width * self.vx / 5,
             bird.rct.centery + bird.rct.height * self.vy / 5
         ]
 
     def update(self, screen):
-        self.rect.move_ip(self.vx, self.vy)
-        screen.blit(self.img, self.rect)
+        self.rct.move_ip(self.vx, self.vy)
+        screen.blit(self.img, self.rct)
         
 
 class Bird:
@@ -144,13 +144,13 @@ class Explosion:
         self.exp_img_lst = [
             pg.transform.flip(exp_img, i, j) for i in [True, False] for j in [True, False]
         ]
-        self.rect = exp_img.get_rect()
-        self.rect.center = bomb.rct.center
+        self.rct = exp_img.get_rect()
+        self.rct.center = bomb.rct.center
         self.life = 10
 
     def update(self, screen: pg.Surface):
         self.life -= 1
-        screen.blit(self.exp_img_lst[self.life % len(self.exp_img_lst)], self.rect)
+        screen.blit(self.exp_img_lst[self.life % len(self.exp_img_lst)], self.rct)
 
 class Score:
     def __init__(self):
@@ -158,12 +158,12 @@ class Score:
         self.txt_color = (0, 0, 255)
         self.score = 0
         self.img = self.font.render(f"スコア:{self.score}", 0, self.txt_color)
-        self.rect = self.img.get_rect()
-        self.rect.center = (100, HEIGHT - 50)
+        self.rct = self.img.get_rect()
+        self.rct.center = (100, HEIGHT - 50)
 
     def update(self, screen: pg.Surface):
         self.img = self.font.render(f"スコア:{self.score}", 0, self.txt_color)
-        screen.blit(self.img, self.rect)
+        screen.blit(self.img, self.rct)
 
 def main():
     pg.display.set_caption("たたかえ！こうかとん")
@@ -195,7 +195,7 @@ def main():
                     time.sleep(1)
                     return
             if beam is not None and bomb is not None: 
-                if beam.rect.colliderect(bomb.rct):
+                if beam.rct.colliderect(bomb.rct):
                     score.score += 1
                     explosion_lst.append(Explosion(bomb))
                     beam = None
