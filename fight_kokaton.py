@@ -63,7 +63,8 @@ class Bird:
             else pg.transform.flip(pg.transform.rotozoom(self.img, 45 * j, 1), True, False) if i >= 0 \
             else pg.transform.rotozoom(self.img, 45 * j, 1) for i in range(-1, 2) for j in range(-1, 2)
         }   #移動量の合計値をキーとするこうかとんの画像Surfaceの辞書を作成
-        self.img = self.img_dict[(5, 0)]
+        self.last_sum_mv = (5, 0)
+        self.img = self.img_dict[self.last_sum_mv]
         self.rct = self.img.get_rect()
         self.rct.center = xy
 
@@ -90,7 +91,9 @@ class Bird:
         self.rct.move_ip(sum_mv)
         if check_bound(self.rct) != (True, True):
             self.rct.move_ip(-sum_mv[0], -sum_mv[1])
-        self.img = self.img_dict[tuple(sum_mv)]
+        if sum_mv != [0, 0]:
+            self.last_sum_mv = tuple(sum_mv)
+        self.img = self.img_dict[self.last_sum_mv]
         screen.blit(self.img, self.rct)
 
 
